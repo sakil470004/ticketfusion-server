@@ -104,7 +104,7 @@ async function run() {
     // comment routes
     app.post("/comments", async (req, res) => {
       const comment = req.body;
-      const result = await commentCollection.insertMany(comment);
+      const result = await commentCollection.insertOne(comment);
       res.json(result);
     });
     app.get("/comments", async (req, res) => {
@@ -112,6 +112,7 @@ async function run() {
       const comments = await cursor.toArray();
       res.json(comments);
     });
+  
 
     // event routes
     app.post("/events", async (req, res) => {
