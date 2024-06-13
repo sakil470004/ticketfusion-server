@@ -45,6 +45,7 @@ async function run() {
     const database = client.db("ticket-fusion-db");
     const eventCollection = database.collection("events");
     const userCollection = database.collection("users");
+    const commentCollection = database.collection("comments");
     // // category routes
     // app.post("/categories", async (req, res) => {
     //   const category = req.body;
@@ -100,7 +101,19 @@ async function run() {
     //   });
     //   res.json(product);
     // });
-// event routes
+    // comment routes
+    app.post("/comments", async (req, res) => {
+      const comment = req.body;
+      const result = await commentCollection.insertMany(comment);
+      res.json(result);
+    });
+    app.get("/comments", async (req, res) => {
+      const cursor = commentCollection.find({});
+      const comments = await cursor.toArray();
+      res.json(comments);
+    });
+
+    // event routes
     app.post("/events", async (req, res) => {
       const event = req.body;
       const result = await eventCollection.insertOne(event);
