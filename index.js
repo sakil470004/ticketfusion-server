@@ -112,7 +112,6 @@ async function run() {
       const comments = await cursor.toArray();
       res.json(comments);
     });
-  
 
     // event routes
     app.post("/events", async (req, res) => {
@@ -125,6 +124,12 @@ async function run() {
       const events = await cursor.toArray();
       res.json(events);
     });
+    app.get("/events/:id", async (req, res) => {
+      const id = req.params.id;
+      const event = await eventCollection.findOne({ _id: new ObjectId(id) });
+      res.json(event);
+    });
+    
     // user routes
     app.post("/users", async (req, res) => {
       const user = req.body;

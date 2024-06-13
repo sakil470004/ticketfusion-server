@@ -1,4 +1,4 @@
-# Easy Bazaar Server
+<!-- # Easy Bazaar Server
 
 [![Build Status](https://img.shields.io/travis/username/repo.svg)](https://travis-ci.org/username/repo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -34,4 +34,4 @@ Contributions are welcome! Please follow the guidelines outlined in [CONTRIBUTIN
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). -->
