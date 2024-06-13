@@ -103,7 +103,7 @@ async function run() {
 // event routes
     app.post("/events", async (req, res) => {
       const event = req.body;
-      const result = await eventCollection.insertMany(event);
+      const result = await eventCollection.insertOne(event);
       res.json(result);
     });
     app.get("/events", async (req, res) => {
