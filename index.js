@@ -6,6 +6,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const env = require("dotenv");
 env.config();
 const jwt = require("jsonwebtoken");
+const e = require("express");
 const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
@@ -156,14 +157,30 @@ async function run() {
     // setBook routes
     app.post("/sitBook", async (req, res) => {
       const sitBook = req.body;
-      const result = await sitBookCollection.insertOne(sitBook);
-      res.json(result);
+      // check if there exist a sitBook with the same email and eventId
+      const filter = { email: sitBook.email, eventId: sitBook.eventId };
+      const existingSitBook = await sitBookCollection.findOne(filter);
+
+      if (!existingSitBook) {
+        const result = await sitBookCollection.insertOne(sitBook);
+        res.json({...result,message:"Ticket Book Successfully"});
+      } else {
+        const newTicketNumber =
+          existingSitBook.ticketNumber + parseInt(sitBook.ticketNumber);
+        const updateDoc = {
+          $set: { ticketNumber: newTicketNumber },
+        };
+        const result = await sitBookCollection.updateOne(filter, updateDoc);
+        res.json({...result,message:"Ticket Update Book Successfully"});
+  
+      }
     });
     app.get("/sitBook", async (req, res) => {
       const cursor = sitBookCollection.find({});
       const sitBooks = await cursor.toArray();
       res.json(sitBooks);
     });
+    
     //  update sitBook
     app.patch("/sitBook/:id", async (req, res) => {
       const id = req.params.id;
@@ -195,7 +212,7 @@ async function run() {
       const sitBook = await sitBookCollection.find({ email: email }).toArray();
       res.json(sitBook);
     });
-    
+
     // user routes
     app.post("/users", async (req, res) => {
       const user = req.body;
