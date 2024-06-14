@@ -1,22 +1,23 @@
 
-```markdown
 # Ticket Fusion Server
 
 Ticket Fusion is a server application for managing events, users, comments, seat bookings, and payments. This project is built using Node.js, Express, MongoDB, and integrates with Stripe for payment processing.
 
 ## Table of Contents
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [API Endpoints](#api-endpoints)
-  - [Comments](#comments)
-  - [Events](#events)
-  - [Seat Booking](#seat-booking)
-  - [Users](#users)
-  - [Payments](#payments)
-- [Authentication](#authentication)
-- [Permissions Policy](#permissions-policy)
-- [Contributing](#contributing)
-- [License](#license)
+- [Ticket Fusion Server](#ticket-fusion-server)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [API Endpoints](#api-endpoints)
+    - [Comments](#comments)
+    - [Events](#events)
+    - [Seat Booking](#seat-booking)
+    - [Users](#users)
+    - [Payments](#payments)
+  - [Authentication](#authentication)
+  - [Permissions Policy](#permissions-policy)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ## Installation
 
