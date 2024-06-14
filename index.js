@@ -46,6 +46,7 @@ async function run() {
     const eventCollection = database.collection("events");
     const userCollection = database.collection("users");
     const commentCollection = database.collection("comments");
+    const sitBookCollection = database.collection("sitBook");
     // // category routes
     // app.post("/categories", async (req, res) => {
     //   const category = req.body;
@@ -138,7 +139,11 @@ async function run() {
       const updateDoc = {
         $set: restUpdate,
       };
-      const result = await eventCollection.updateOne(filter, updateDoc, options);
+      const result = await eventCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       res.json(result);
     });
     app.delete("/events/:id", async (req, res) => {
@@ -148,7 +153,48 @@ async function run() {
       });
       res.json(result);
     });
-
+    // setBook routes
+    app.post("/sitBook", async (req, res) => {
+      const sitBook = req.body;
+      const result = await sitBookCollection.insertOne(sitBook);
+      res.json(result);
+    });
+    app.get("/sitBook", async (req, res) => {
+      const cursor = sitBookCollection.find({});
+      const sitBooks = await cursor.toArray();
+      res.json(sitBooks);
+    });
+    // filter sitBook by event id
+    app.get("/sitBook/:eventId", async (req, res) => {
+      const eventId = req.params.eventId;
+      const sitBook = await sitBookCollection
+        .find({ eventId: eventId })
+        .toArray();
+      res.json(sitBook);
+    });
+    // filter sitBook by email
+    app.get("/sitBook/email/:email", async (req, res) => {
+      const email = req.params.email;
+      const sitBook = await sitBookCollection.find({ email: email }).toArray();
+      res.json(sitBook);
+    });
+    //  update sitBook
+    app.patch("/sitBook/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedSitBook = req.body;
+      const { _id, ...restUpdate } = updatedSitBook;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: restUpdate,
+      };
+      const result = await sitBookCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.json(result);
+    });
     // user routes
     app.post("/users", async (req, res) => {
       const user = req.body;
