@@ -20,7 +20,7 @@ function createToken(user) {
   );
 }
 async function verifyToken(req, res, next) {
-  const token = await req.headers.authorization.split(" ")[1];
+  const token = await req?.headers?.authorization?.split(" ")[1];
   await jwt.verify(token, "mysecretkey", (err, decoded) => {
     if (err) {
       res.status(401).send({ status: "Invalid token" });
@@ -48,63 +48,10 @@ async function run() {
     const userCollection = database.collection("users");
     const commentCollection = database.collection("comments");
     const sitBookCollection = database.collection("sitBook");
-    // // category routes
-    // app.post("/categories", async (req, res) => {
-    //   const category = req.body;
-    //   const result = await categoryCollection.insertOne(category);
-    //   res.json(result);
-    // });
-    // app.get("/categories", async (req, res) => {
-    //   const cursor = categoryCollection.find({});
-    //   const categories = await cursor.toArray();
-    //   res.json(categories);
-    // });
+   
 
-    // // product routes
-    // app.post("/products", verifyToken, async (req, res) => {
-    //   const product = req.body;
-    //   const result = await productCollection.insertOne(product);
-
-    //   res.json(result);
-    // });
-    // app.patch("/products/:id", verifyToken, async (req, res) => {
-    //   const id = req.params.id;
-    //   const updatedProduct = req.body;
-    //   const { _id, ...restUpdate } = updatedProduct;
-    //   const filter = { _id: new ObjectId(id) };
-    //   const options = { upsert: true };
-    //   const updateDoc = {
-    //     $set: restUpdate,
-    //   };
-    //   const result = await productCollection.updateOne(
-    //     filter,
-    //     updateDoc,
-    //     options
-    //   );
-    //   res.json(result);
-    // });
-    // app.delete("/products/:id", verifyToken, async (req, res) => {
-    //   const id = req.params.id;
-    //   const result = await productCollection.deleteOne({
-    //     _id: new ObjectId(id),
-    //   });
-    //   res.json(result);
-    // });
-
-    // app.get("/products", async (req, res) => {
-    //   const cursor = productCollection.find({});
-    //   const products = await cursor.toArray();
-    //   res.json(products);
-    // });
-    // app.get("/products/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const product = await productCollection.findOne({
-    //     _id: new ObjectId(id),
-    //   });
-    //   res.json(product);
-    // });
     // comment routes
-    app.post("/comments", async (req, res) => {
+    app.post("/comments", verifyToken,async (req, res) => {
       const comment = req.body;
       const result = await commentCollection.insertOne(comment);
       res.json(result);
@@ -116,7 +63,7 @@ async function run() {
     });
 
     // event routes
-    app.post("/events", async (req, res) => {
+    app.post("/events",verifyToken, async (req, res) => {
       const event = req.body;
       const result = await eventCollection.insertOne(event);
       res.json(result);
@@ -131,7 +78,7 @@ async function run() {
       const event = await eventCollection.findOne({ _id: new ObjectId(id) });
       res.json(event);
     });
-    app.patch("/events/:id", async (req, res) => {
+    app.patch("/events/:id",verifyToken, async (req, res) => {
       const id = req.params.id;
       const updatedEvent = req.body;
       const { _id, ...restUpdate } = updatedEvent;
@@ -147,7 +94,7 @@ async function run() {
       );
       res.json(result);
     });
-    app.delete("/events/:id", async (req, res) => {
+    app.delete("/events/:id", verifyToken ,async (req, res) => {
       const id = req.params.id;
       const result = await eventCollection.deleteOne({
         _id: new ObjectId(id),
@@ -155,7 +102,7 @@ async function run() {
       res.json(result);
     });
     // setBook routes
-    app.post("/sitBook", async (req, res) => {
+    app.post("/sitBook",verifyToken, async (req, res) => {
       const sitBook = req.body;
       // check if there exist a sitBook with the same email and eventId
       const filter = { email: sitBook.email, eventId: sitBook.eventId };
@@ -185,7 +132,7 @@ async function run() {
       const sitBooks = await cursor.toArray();
       res.json(sitBooks);
     });
-    app.delete("/sitBook/:id", async (req, res) => {
+    app.delete("/sitBook/:id",verifyToken, async (req, res) => {
       const id = req.params.id;
       const result = await sitBookCollection.deleteOne({
         _id: new ObjectId(id),
