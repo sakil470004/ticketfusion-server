@@ -164,20 +164,6 @@ async function run() {
       const sitBooks = await cursor.toArray();
       res.json(sitBooks);
     });
-    // filter sitBook by event id
-    app.get("/sitBook/:eventId", async (req, res) => {
-      const eventId = req.params.eventId;
-      const sitBook = await sitBookCollection
-        .find({ eventId: eventId })
-        .toArray();
-      res.json(sitBook);
-    });
-    // filter sitBook by email
-    app.get("/sitBook/email/:email", async (req, res) => {
-      const email = req.params.email;
-      const sitBook = await sitBookCollection.find({ email: email }).toArray();
-      res.json(sitBook);
-    });
     //  update sitBook
     app.patch("/sitBook/:id", async (req, res) => {
       const id = req.params.id;
@@ -195,6 +181,21 @@ async function run() {
       );
       res.json(result);
     });
+    // filter sitBook by event id
+    app.get("/filterBook/:eventId", async (req, res) => {
+      const eventId = req.params.eventId;
+      const sitBook = await sitBookCollection
+        .find({ eventId: eventId })
+        .toArray();
+      res.json(sitBook);
+    });
+    // filter sitBook by email
+    app.get("/filterBook/:email", async (req, res) => {
+      const email = req.params.email;
+      const sitBook = await sitBookCollection.find({ email: email }).toArray();
+      res.json(sitBook);
+    });
+    
     // user routes
     app.post("/users", async (req, res) => {
       const user = req.body;
