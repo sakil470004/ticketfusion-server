@@ -163,16 +163,20 @@ async function run() {
 
       if (!existingSitBook) {
         const result = await sitBookCollection.insertOne(sitBook);
-        res.json({...result,message:"Ticket Book Successfully"});
+        res.json({ ...result, message: "Ticket Book Successfully" });
       } else {
         const newTicketNumber =
           existingSitBook.ticketNumber + parseInt(sitBook.ticketNumber);
+        const newMoney = parseInt(existingSitBook.price) + parseInt(sitBook.price);
         const updateDoc = {
-          $set: { ticketNumber: newTicketNumber },
+          $set: {
+            ticketNumber: newTicketNumber,
+            price: newMoney,
+          },
         };
+
         const result = await sitBookCollection.updateOne(filter, updateDoc);
-        res.json({...result,message:"Ticket Update Book Successfully"});
-  
+        res.json({ ...result, message: "Ticket Update Book Successfully" });
       }
     });
     app.get("/sitBook", async (req, res) => {
@@ -180,7 +184,17 @@ async function run() {
       const sitBooks = await cursor.toArray();
       res.json(sitBooks);
     });
-    
+    // get setBook by eventId and email
+    app.get("/sitBook/:eventId/:email", async (req, res) => {
+      const eventId = req.params.eventId;
+      const email = req.params.email;
+      const sitBook = await sitBookCollection.findOne({
+        eventId: eventId,
+        email: email,
+      });
+      res.json(sitBook);
+    });
+
     //  update sitBook
     app.patch("/sitBook/:id", async (req, res) => {
       const id = req.params.id;
