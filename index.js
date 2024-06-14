@@ -167,7 +167,8 @@ async function run() {
       } else {
         const newTicketNumber =
           existingSitBook.ticketNumber + parseInt(sitBook.ticketNumber);
-        const newMoney = parseInt(existingSitBook.price) + parseInt(sitBook.price);
+        const newMoney =
+          parseInt(existingSitBook.price) + parseInt(sitBook.price);
         const updateDoc = {
           $set: {
             ticketNumber: newTicketNumber,
@@ -183,6 +184,13 @@ async function run() {
       const cursor = sitBookCollection.find({});
       const sitBooks = await cursor.toArray();
       res.json(sitBooks);
+    });
+    app.delete("/sitBook/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await sitBookCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+      res.json(result);
     });
     // get setBook by eventId and email
     app.get("/sitBook/:eventId/:email", async (req, res) => {
@@ -213,7 +221,7 @@ async function run() {
       res.json(result);
     });
     // filter sitBook by event id
-    app.get("/filterBook/:eventId", async (req, res) => {
+    app.get("/filterByEventID/:eventId", async (req, res) => {
       const eventId = req.params.eventId;
       const sitBook = await sitBookCollection
         .find({ eventId: eventId })
@@ -221,7 +229,7 @@ async function run() {
       res.json(sitBook);
     });
     // filter sitBook by email
-    app.get("/filterBook/:email", async (req, res) => {
+    app.get("/filterByEmail/:email", async (req, res) => {
       const email = req.params.email;
       const sitBook = await sitBookCollection.find({ email: email }).toArray();
       res.json(sitBook);
