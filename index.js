@@ -1,15 +1,22 @@
 const express = require("express");
 const app = express();
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', "interest-cohort=()");
+  next();
+});
+
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 // env config
 const env = require("dotenv");
 env.config();
 const jwt = require("jsonwebtoken");
-const e = require("express");
+
 const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
+// for payment
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 
 function createToken(user) {
   return jwt.sign(
@@ -48,10 +55,10 @@ async function run() {
     const userCollection = database.collection("users");
     const commentCollection = database.collection("comments");
     const sitBookCollection = database.collection("sitBook");
-   
+    const paymentCollection = database.collection("payments");
 
     // comment routes
-    app.post("/comments", verifyToken,async (req, res) => {
+    app.post("/comments", verifyToken, async (req, res) => {
       const comment = req.body;
       const result = await commentCollection.insertOne(comment);
       res.json(result);
@@ -63,7 +70,7 @@ async function run() {
     });
 
     // event routes
-    app.post("/events",verifyToken, async (req, res) => {
+    app.post("/events", verifyToken, async (req, res) => {
       const event = req.body;
       const result = await eventCollection.insertOne(event);
       res.json(result);
@@ -78,7 +85,7 @@ async function run() {
       const event = await eventCollection.findOne({ _id: new ObjectId(id) });
       res.json(event);
     });
-    app.patch("/events/:id",verifyToken, async (req, res) => {
+    app.patch("/events/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const updatedEvent = req.body;
       const { _id, ...restUpdate } = updatedEvent;
@@ -94,7 +101,7 @@ async function run() {
       );
       res.json(result);
     });
-    app.delete("/events/:id", verifyToken ,async (req, res) => {
+    app.delete("/events/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const result = await eventCollection.deleteOne({
         _id: new ObjectId(id),
@@ -102,7 +109,7 @@ async function run() {
       res.json(result);
     });
     // setBook routes
-    app.post("/sitBook",verifyToken, async (req, res) => {
+    app.post("/sitBook", verifyToken, async (req, res) => {
       const sitBook = req.body;
       // check if there exist a sitBook with the same email and eventId
       const filter = { email: sitBook.email, eventId: sitBook.eventId };
@@ -132,7 +139,16 @@ async function run() {
       const sitBooks = await cursor.toArray();
       res.json(sitBooks);
     });
-    app.delete("/sitBook/:id",verifyToken, async (req, res) => {
+
+    app.get("/singleSitBook/:id", async (req, res) => {
+      const id = req.params.id;
+      const sitBook = await sitBookCollection.findOne({
+        _id: new ObjectId(id),
+      });
+      res.json(sitBook);
+    });
+
+    app.delete("/sitBook/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const result = await sitBookCollection.deleteOne({
         _id: new ObjectId(id),
@@ -221,6 +237,42 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc, options);
       res.json(result);
     });
+    // payment routes
+      // create payment intent
+      app.post('/create-payment-intent', verifyToken, async (req, res) => {
+        const { price } = req.body;
+        const amount = parseInt(price * 100);
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount,
+            currency: 'usd',
+            payment_method_types: ['card']
+        });
+
+        res.send({
+            clientSecret: paymentIntent.client_secret
+        })
+    })
+
+
+    // payment related api
+    app.post('/payments', async (req, res) => {
+        const payment = req.body;
+        const insertResult = await paymentCollection.insertOne(payment);
+
+        const query = { _id: new ObjectId(payment.itemId) }
+        const deleteResult = await sitBookCollection.deleteOne(query)
+        res.send({ ...insertResult, deleteResult });
+    })
+    // get Payment History 
+    app.get('/paymentHistory/:email', async (req, res) => {
+        const email = req.params.email;
+        let query={};
+        if (email) {
+            query = { email: email };
+        }
+        const result = await paymentCollection.find(query).sort({ fieldToSort: -1 }).toArray();
+        res.send(result)
+    })
   } finally {
     // await client.close();
   }
