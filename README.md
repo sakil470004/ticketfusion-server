@@ -1,4 +1,3 @@
-Here's a `README.md` documentation for your project:
 
 ```markdown
 # Ticket Fusion Server
