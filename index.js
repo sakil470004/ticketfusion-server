@@ -129,7 +129,26 @@ async function run() {
       const event = await eventCollection.findOne({ _id: new ObjectId(id) });
       res.json(event);
     });
-    
+    app.patch("/events/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedEvent = req.body;
+      const { _id, ...restUpdate } = updatedEvent;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: restUpdate,
+      };
+      const result = await eventCollection.updateOne(filter, updateDoc, options);
+      res.json(result);
+    });
+    app.delete("/events/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await eventCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+      res.json(result);
+    });
+
     // user routes
     app.post("/users", async (req, res) => {
       const user = req.body;
